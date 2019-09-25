@@ -1,0 +1,56 @@
+# frozen_string_literal: true
+
+name 'nmea2000'
+
+import_types_from 'std'
+import_types_from 'canbus'
+
+using_task_library 'iodrivers_base'
+
+using_library 'nmea2000'
+import_types_from 'nmea2000/Message.hpp'
+import_types_from 'nmea2000Types.hpp'
+
+task_context 'CANTask' do
+    needs_configuration
+
+    # The CAN messages
+    input_port 'can_in', '/canbus/Message'
+
+    # The NMEA2000 messages
+    output_port 'msg_out', '/nmea2000/Message'
+
+    port_driven
+end
+
+task_context 'ActisenseTask', subclasses: 'iodrivers_base::Task' do
+    needs_configuration
+
+    output_port 'msg_out', '/nmea2000/Message'
+end
+
+task_context 'AISTask' do
+    needs_configuration
+
+    input_port 'msg_in', '/nmea2000/Message'
+
+    output_port 'position_samples', '/nmea2000/AISPosition'
+    output_port 'vessel_info_samples', '/nmea2000/AISVesselInformation'
+end
+
+task_context 'AirmarDepthSounder' do
+    needs_configuration
+
+    input_port 'msg_in', '/nmea2000/Message'
+
+    output_port 'altitude_samples', '/base/samples/RigidBodyState'
+    output_port 'quality_samples', '/nmea2000/AirmarAltitudeQuality'
+end
+
+task_context 'FuelTankLevel' do
+    needs_configuration
+
+    input_port 'msg_in', '/nmea2000/Message'
+
+    output_port 'level_out', '/nmea2000/FluidLevel'
+end

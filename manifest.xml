@@ -1,0 +1,20 @@
+<package>
+  <description brief="oroGen components to interface with NMEA2000 systems">
+  
+  </description>
+  <author>Sylvain Joyeux/sylvain.joyeux@tidewise.io</author>
+  <license></license>
+  <url>http://</url>
+  <logo>http://</logo>
+  <depend package="base/cmake" />
+  <!--
+   To add any dependencies use the depend tag
+  <depend package="dummy-dependency-0" />
+	...
+  <depend package="dummy-dependency-n-1" />
+  <depend package="dummy-dependency-n" />
+  -->
+  <depend package="drivers/orogen/canbus" />
+  <depend package="drivers/nmea2000" />
+  <depend package="drivers/orogen/iodrivers_base" />
+</package>
