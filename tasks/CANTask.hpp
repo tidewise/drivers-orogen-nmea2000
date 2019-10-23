@@ -4,8 +4,10 @@
 #define NMEA2000_CANTASK_TASK_HPP
 
 #include "nmea2000/CANTaskBase.hpp"
+#include <nmea2000/PGNLibrary.hpp>
 
 namespace nmea2000{
+    class Receiver;
     class DeviceDispatcher;
 
     /*! \class CANTask
@@ -23,13 +25,16 @@ namespace nmea2000{
      *     task('custom_task_name','nmea2000::CANTask')
      * end
      * \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     * It can be dynamically adapted when the deployment is called with a
+     * prefix argument.
      */
     class CANTask : public CANTaskBase
     {
         friend class CANTaskBase;
 
     protected:
+        PGNLibrary m_library;
+        std::unique_ptr<Receiver> m_receiver;
         std::unique_ptr<DeviceDispatcher> m_dispatcher;
 
     public:

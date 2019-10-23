@@ -2,12 +2,14 @@
 
 #include "CANTask.hpp"
 #include "DeviceDispatcher.hpp"
+#include <nmea2000/PGNs.hpp>
+#include <nmea2000/Receiver.hpp>
 
 using namespace nmea2000;
 
 CANTask::CANTask(std::string const& name)
     : CANTaskBase(name)
-{
+    , m_library(pgns::getLibrary()) {
 }
 
 CANTask::~CANTask()
@@ -33,6 +35,7 @@ bool CANTask::startHook()
         return false;
     }
     m_dispatcher->resetQueryLogic();
+    m_receiver.reset(new Receiver(m_library));
     return true;
 }
 void CANTask::updateHook()
@@ -48,11 +51,16 @@ void CANTask::updateHook()
     canbus::Message can;
     while (_can_in.read(can) == RTT::NewData) {
         auto msg = Message::fromCAN(can);
+        auto resolver_state = m_receiver->process(msg);
+        if (resolver_state.first < Receiver::COMPLETE) {
+            continue;
+        }
         auto resolved_devices = m_dispatcher->process(msg);
+        auto resolved_devices = m_dispatcher->process(resolver_state.second);
         for (auto const& d : resolved_devices) {
             _resolved_devices.write(d);
         }
-        _messages.write(msg);
+        _messages.write(resolver_state.second);
     }
 
     CANTaskBase::updateHook();
