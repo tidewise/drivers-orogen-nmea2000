@@ -16,7 +16,8 @@ task_context 'CANTask' do
     needs_configuration
 
     # CAN message received by the bus
-    input_port 'can_in', '/canbus/Message'
+    input_port('can_in', '/canbus/Message')
+        .needs_reliable_connection
 
     # CAN messages sent to the bus
     output_port 'can_out', '/canbus/Message'
