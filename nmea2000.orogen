@@ -106,10 +106,11 @@ task_context 'AirmarDepthSounder' do
     output_port 'quality_samples', '/nmea2000/AirmarAltitudeQuality'
 end
 
-task_context 'FuelTankLevel' do
+task_context 'FluidLevelTask' do
     needs_configuration
 
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'level_out', '/nmea2000/FluidLevel'
+    port_driven
 end
