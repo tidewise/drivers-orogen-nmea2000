@@ -1,6 +1,7 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include "AISTask.hpp"
+#include <nmea2000/PGNs.hpp>
 
 using namespace nmea2000;
 
@@ -33,6 +34,69 @@ bool AISTask::startHook()
 }
 void AISTask::updateHook()
 {
+    Message msg;
+    while (_msg_in.read(msg) == RTT::NewData) {
+        if (pgns::AISClassAPositionReport::ID == msg.pgn) {
+            pgns::AISClassAPositionReport in =
+                pgns::AISClassAPositionReport::fromMessage(msg);
+            AISPosition position_out;
+            position_out.time = in.time;
+            position_out.mmsi = in.user_id;
+            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.latitude = base::Angle::fromDeg(in.latitude);
+            position_out.longitude = base::Angle::fromDeg(in.longitude);
+            position_out.status = (NavigationalStatus)in.nav_status;
+            position_out.high_accuracy_position = (in.position_accuracy == 1);
+            position_out.yaw = base::Angle::fromDeg(in.heading);
+            position_out.yaw_velocity = in.rate_of_turn * M_PI / 180;
+            position_out.speed_over_ground = in.sog;
+            _vessel_position.write(position_out);
+        }
+        else if (pgns::AISClassBPositionReport::ID == msg.pgn) {
+            pgns::AISClassBPositionReport in =
+                pgns::AISClassBPositionReport::fromMessage(msg);
+            AISPosition position_out;
+            position_out.time = in.time;
+            position_out.mmsi = in.user_id;
+            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.latitude = base::Angle::fromDeg(in.latitude);
+            position_out.longitude = base::Angle::fromDeg(in.longitude);
+            position_out.high_accuracy_position = (in.position_accuracy == 1);
+            position_out.yaw = base::Angle::fromDeg(in.heading);
+            position_out.speed_over_ground = in.sog;
+            _vessel_position.write(position_out);
+        }
+        else if (pgns::AISClassBExtendedPositionReport::ID == msg.pgn) {
+            pgns::AISClassBExtendedPositionReport in =
+                pgns::AISClassBExtendedPositionReport::fromMessage(msg);
+            AISPosition position_out;
+            position_out.time = in.time;
+            position_out.mmsi = in.user_id;
+            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.latitude = base::Angle::fromDeg(in.latitude);
+            position_out.longitude = base::Angle::fromDeg(in.longitude);
+            position_out.high_accuracy_position = false;
+            position_out.yaw = base::Angle::fromDeg(in.true_heading);
+            position_out.speed_over_ground = in.sog;
+            _vessel_position.write(position_out);
+
+            AISVesselInformation info_out;
+            info_out.time = in.time;
+            info_out.mmsi = in.user_id;
+            info_out.imo = 0;
+            info_out.name = in.name;
+            info_out.length = in.length;
+            info_out.width = in.beam;
+            info_out.ship_type = in.type_of_ship;
+            info_out.position_device_type = in.gnss_type;
+            info_out.reference_position =
+                Eigen::Vector3d(in.position_reference_from_bow,
+                                -in.position_reference_from_starboard,
+                                0);
+            _vessel_info.write(info_out);
+        }
+
+    }
     AISTaskBase::updateHook();
 }
 void AISTask::errorHook()
