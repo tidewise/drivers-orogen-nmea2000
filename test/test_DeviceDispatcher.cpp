@@ -119,6 +119,34 @@ TEST_F(DeviceDispatcherTest, it_transitions_to_product_info_query_after_the_quer
     ASSERT_EQ((make_pair(true, product_info)), dispatcher.getQueryProbeMessage());
 }
 
+TEST_F(DeviceDispatcherTest, it_queries_other_device_info_once_receiving_one) {
+    DeviceDispatcher dispatcher(
+        { getSerialNumberFilter("does_not_exist") },
+        base::Time::fromSeconds(25), base::Time::fromMilliseconds(10)
+    );
+
+    dispatcher.getQueryState();
+    dispatcher.getQueryProbeMessage();
+
+    auto claim0 = iso_address_claim;
+    auto claim1 = iso_address_claim;
+    claim1.source++;
+    dispatcher.process(claim0);
+    dispatcher.process(claim1);
+
+    ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
+    ASSERT_EQ((make_pair(false, Message())), dispatcher.getQueryProbeMessage());
+
+    usleep(20000);
+    ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
+    auto product_info_query = Receiver::queryProductInformation(claim0.source);
+    ASSERT_EQ((make_pair(true, product_info_query)), dispatcher.getQueryProbeMessage());
+    dispatcher.process(product_info);
+    ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
+    product_info_query = Receiver::queryProductInformation(claim1.source);
+    ASSERT_EQ((make_pair(true, product_info_query)), dispatcher.getQueryProbeMessage());
+}
+
 TEST_F(DeviceDispatcherTest, it_transitions_to_COMPLETE_if_all_expected_product_info_are_received_and_all_filters_are_matched) {
     DeviceDispatcher dispatcher(
         { getSerialNumberFilter() },

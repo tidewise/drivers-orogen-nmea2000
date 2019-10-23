@@ -41,6 +41,7 @@ namespace nmea2000 {
         base::Time m_enumeration_ack_deadline;
         bool m_query_address_claim = false;
         std::set<int> m_pending_product_queries;
+        bool m_received_expected_product_info = false;
 
         std::vector<ResolvedDevice> processProductInformation(Message const& msg);
 

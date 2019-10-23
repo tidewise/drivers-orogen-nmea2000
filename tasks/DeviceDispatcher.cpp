@@ -89,12 +89,18 @@ std::pair<bool, Message> DeviceDispatcher::getQueryProbeMessage() {
     auto now = base::Time::now();
 
     if (now < m_enumeration_ack_deadline) {
+        if (!m_pending_product_queries.empty() && m_received_expected_product_info) {
+            m_received_expected_product_info = false;
+            int query = *m_pending_product_queries.begin();
+            return make_pair(true, Receiver::queryProductInformation(query));
+        }
         return make_pair(false, Message());
     }
     else if (!m_needs_resolution && !m_continuous_query) {
         return make_pair(false, Message());
     }
 
+    m_received_expected_product_info = false;
     m_query_address_claim = !m_query_address_claim;
     m_enumeration_ack_deadline = now + m_enumeration_ack_timeout;
     if (m_query_address_claim || m_pending_product_queries.empty()) {
@@ -124,7 +130,8 @@ vector<ResolvedDevice> DeviceDispatcher::process(Message const& msg) {
         return vector<ResolvedDevice>();
     }
     else if (msg.pgn == pgns::ProductInformation::ID) {
-        m_pending_product_queries.erase(msg.source);
+        m_received_expected_product_info =
+            (m_pending_product_queries.erase(msg.source) > 0);
         return processProductInformation(msg);
     }
     else {
@@ -187,6 +194,7 @@ void DeviceDispatcher::resetQueryLogic() {
     m_pending_product_queries.clear();
     m_resolution_deadline = now + m_resolution_timeout;
     m_enumeration_ack_deadline = base::Time();
+    m_received_expected_product_info = false;
 }
 
 set<string> DeviceDispatcher::getMatchedFilters(Message const& msg) const {
