@@ -11,6 +11,14 @@ namespace nmea2000 {
      * for both CANTask and ActisenseTask
      */
     class DeviceDispatcher {
+    public:
+        enum QueryState {
+            QUERY_COMPLETE, //! all devices have been resolved
+            QUERY_TIMED_OUT, //! not all devices have been resolved in the allocated time
+            QUERY_IN_PROGRESS
+        };
+
+    private:
         struct DynamicPort {
             DeviceFilter filter;
             bool needs_resolution = false;
@@ -21,10 +29,12 @@ namespace nmea2000 {
 
             bool matches(Message const& msg) const;
         };
+
         std::vector<DynamicPort> m_dynamic_ports;
 
         base::Time m_resolution_timeout;
         base::Time m_enumeration_ack_timeout;
+        bool m_continuous_query = false;
 
         bool m_needs_resolution = true;
         base::Time m_resolution_deadline;
@@ -42,18 +52,13 @@ namespace nmea2000 {
         );
         ~DeviceDispatcher();
 
-        enum QueryState {
-            QUERY_COMPLETE, //! all devices have been resolved
-            QUERY_TIMED_OUT, //! not all devices have been resolved in the allocated time
-            /**
-             * All devices on the bus have been enumerated, but there are
-             * filters that do not match any
-             */
-            QUERY_FAILED,
-            QUERY_SEND_PROBE, //! need to send a new probe
-            QUERY_IN_PROGRESS
-        };
-        std::pair<QueryState, Message> getQueryState();
+        void setContinuousDeviceEnumeration(bool enable);
+
+        bool getContinuousDeviceEnumeration() const;
+
+        std::pair<bool, Message> getQueryProbeMessage();
+
+        QueryState getQueryState() const;
 
         /** Return the bus ID of a resolved filter, or 0 if this filter
          * is not yet resolved

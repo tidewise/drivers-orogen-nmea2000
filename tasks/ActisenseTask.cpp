@@ -19,8 +19,6 @@ ActisenseTask::~ActisenseTask()
 {
 }
 
-
-
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See ActisenseTask.hpp for more detailed
 // documentation about them.
@@ -66,14 +64,21 @@ void ActisenseTask::updateHook()
 {
     ActisenseTaskBase::updateHook();
 
-    auto state = m_dispatcher->getQueryState();
-    if (state.first == DeviceDispatcher::QUERY_TIMED_OUT) {
+    auto query_state = m_dispatcher->getQueryState();
+    if (query_state == DeviceDispatcher::QUERY_TIMED_OUT) {
         exception(DEVICE_RESOLUTION_FAILED);
     }
-    else if (state.first == DeviceDispatcher::QUERY_SEND_PROBE) {
-        m_driver->writeMessage(state.second);
+    else if (query_state == DeviceDispatcher::QUERY_COMPLETE &&
+             state() != QUERY_COMPLETE) {
+        state(QUERY_COMPLETE);
+    }
+
+    auto query_message = m_dispatcher->getQueryProbeMessage();
+    if (query_message.first) {
+        m_driver->writeMessage(query_message.second);
     }
 }
+
 void ActisenseTask::processIO()
 {
     try {

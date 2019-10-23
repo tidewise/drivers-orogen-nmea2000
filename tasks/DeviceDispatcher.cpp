@@ -76,38 +76,50 @@ bool DeviceDispatcher::DynamicPort::matches(Message const& msg) const {
            (!bus_id || msg.source == bus_id);
 }
 
-pair<DeviceDispatcher::QueryState, Message> DeviceDispatcher::getQueryState() {
+
+void DeviceDispatcher::setContinuousDeviceEnumeration(bool enable) {
+    m_continuous_query = enable;
+}
+
+bool DeviceDispatcher::getContinuousDeviceEnumeration() const {
+    return m_continuous_query;
+}
+
+std::pair<bool, Message> DeviceDispatcher::getQueryProbeMessage() {
     auto now = base::Time::now();
 
+    if (now < m_enumeration_ack_deadline) {
+        return make_pair(false, Message());
+    }
+    else if (!m_needs_resolution && !m_continuous_query) {
+        return make_pair(false, Message());
+    }
+
+    m_query_address_claim = !m_query_address_claim;
+    m_enumeration_ack_deadline = now + m_enumeration_ack_timeout;
+    if (m_query_address_claim || m_pending_product_queries.empty()) {
+        m_query_address_claim = true;
+        m_pending_product_queries.clear();
+        return make_pair(true, Receiver::queryAddressClaim());
+    }
+    else {
+        int query = *m_pending_product_queries.begin();
+        return make_pair(true, Receiver::queryProductInformation(query));
+    }
+}
+
+DeviceDispatcher::QueryState DeviceDispatcher::getQueryState() const {
     if (!m_needs_resolution) {
-        return make_pair(QUERY_COMPLETE, Message());
+        return QUERY_COMPLETE;
     }
-    else if (now > m_resolution_deadline) {
-        return make_pair(QUERY_TIMED_OUT, Message());
+    else if (base::Time::now() > m_resolution_deadline) {
+        return QUERY_TIMED_OUT;
     }
-    else if (now > m_enumeration_ack_deadline) {
-        m_query_address_claim = !m_query_address_claim;
-        m_enumeration_ack_deadline = now + m_enumeration_ack_timeout;
-        if (m_query_address_claim || m_pending_product_queries.empty()) {
-            m_query_address_claim = true;
-            m_pending_product_queries.clear();
-            return make_pair(QUERY_SEND_PROBE,
-                             Receiver::queryAddressClaim());
-        }
-        else {
-            int query = *m_pending_product_queries.begin();
-            return make_pair(QUERY_SEND_PROBE,
-                             Receiver::queryProductInformation(query));
-        }
-    }
-    return make_pair(QUERY_IN_PROGRESS, Message());
+    return QUERY_IN_PROGRESS;
 }
 
 vector<ResolvedDevice> DeviceDispatcher::process(Message const& msg) {
-    if (!m_needs_resolution) {
-        return vector<ResolvedDevice>();
-    }
-    else if (msg.pgn == pgns::ISOAddressClaim::ID) {
+    if (msg.pgn == pgns::ISOAddressClaim::ID) {
         m_pending_product_queries.insert(msg.source);
         return vector<ResolvedDevice>();
     }
