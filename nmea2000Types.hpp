@@ -1,28 +1,34 @@
 #ifndef nmea2000_TYPES_HPP
 #define nmea2000_TYPES_HPP
 
-#include <base/Time.hpp>
 #include <base/Angle.hpp>
+#include <base/Float.hpp>
+#include <base/Time.hpp>
 
 namespace nmea2000 {
+    struct DeviceFilter {
+        std::string name;
+
+        uint32_t pgn = 0;
+        uint16_t product_code = 0;
+        std::string model;
+        std::string version;
+        std::string serial_number;
+    };
+
+    struct ResolvedDevice {
+        std::string name;
+        uint8_t bus_id;
+    };
+
     struct FluidLevel {
         base::Time time;
 
-        enum Type {
-            FUEL = 0,
-            WATER = 1,
-            GRAY_WATER = 2,
-            LIVE_WELL = 3,
-            OIL = 4,
-            BLACK_WATGER = 5
-        };
-
-        Type type;
-        float level;
-        float capacity;
+        float level = base::unknown<float>();
+        float capacity = base::unknown<float>();
     };
 
-    enum NAVIGATIONAL_STATUS {
+    enum NavigationalStatus {
         STATUS_UNDER_WAY_USING_ENGINE = 0,
         STATUS_AT_ANCHOR = 1,
         STATUS_NOT_UNDER_COMMAND = 2,
@@ -46,41 +52,43 @@ namespace nmea2000 {
         base::Time time;
 
         /** The vessel MMSI number */
-        int mmsi;
+        int mmsi = 0;
 
         /** Vessel course over ground */
         base::Angle course_over_ground;
         base::Angle latitude;
         base::Angle longitude;
-        NAVIGATIONAL_STATUS status;
+        NavigationalStatus status;
 
         /** Whether the GPS position is using differential (< 10m resolution) or
          * not
          */
-        bool high_accuracy_position;
+        bool high_accuracy_position = false;
         /** Vessel heading */
         base::Angle yaw;
         /** Velocity in yaw, in rad/s */
-        double yaw_velocity;
+        float yaw_velocity = base::unknown<float>();
         /** Speed over ground, in m/s */
-        double speed_over_ground;
+        float speed_over_ground = base::unknown<float>();
     };
 
     /** Representation of the data stored in AIS Message 5 */
     struct AISVesselInformation {
         base::Time time;
 
-        int mmsi;
-        int imo;
+        int mmsi = 0;
+        int imo = 0;
         std::string call_sign;
         std::string name;
-        int ship_type;
-        int position_device_type;
-        double draught;
-        double length;
-        double width;
-        double gross_weight;
-        double dead_weight;
+        int ship_type = 0;
+        int position_device_type = 0;
+        float draught = base::unknown<float>();
+        float length = base::unknown<float>();
+        float width = base::unknown<float>();
+        float gross_weight = base::unknown<float>();
+        float dead_weight = base::unknown<float>();
+
+        base::Vector3d reference_position;
     };
 
     /** Measurement quality factor reported by Airmar depth sounders */
