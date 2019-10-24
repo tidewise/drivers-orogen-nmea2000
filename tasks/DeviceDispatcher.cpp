@@ -179,6 +179,11 @@ bool DeviceDispatcher::dispatch(Message const& msg) {
     for (auto& port : m_dynamic_ports) {
         if (port.matches(msg)) {
             written = true;
+            if (!port.port) {
+                throw std::runtime_error(
+                    "DeviceDispatcher: #dispatch called before #addPort"
+                );
+            }
             port.port->write(msg);
         }
     }

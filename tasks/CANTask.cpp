@@ -27,6 +27,7 @@ bool CANTask::configureHook()
         _enumeration_ack_timeout.get()
     ));
     m_dispatcher->setContinuousDeviceEnumeration(_continuous_device_enumeration.get());
+    m_dispatcher->addPorts(*this);
 
     return true;
 }
@@ -89,5 +90,6 @@ void CANTask::stopHook()
 }
 void CANTask::cleanupHook()
 {
+    m_dispatcher->removePorts(*this);
     CANTaskBase::cleanupHook();
 }
