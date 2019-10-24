@@ -131,7 +131,9 @@ vector<ResolvedDevice> DeviceDispatcher::process(Message const& msg) {
     }
     else if (msg.pgn == pgns::ProductInformation::ID) {
         m_received_expected_product_info =
-            (m_pending_product_queries.erase(msg.source) > 0);
+            (!m_pending_product_queries.empty() &&
+             *m_pending_product_queries.begin() == msg.source);
+        m_pending_product_queries.erase(msg.source);
         return processProductInformation(msg);
     }
     else {
