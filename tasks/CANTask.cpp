@@ -45,20 +45,6 @@ bool CANTask::startHook()
 }
 void CANTask::updateHook()
 {
-    auto query_state = m_dispatcher->getQueryState();
-    if (query_state == DeviceDispatcher::QUERY_TIMED_OUT) {
-        exception(DEVICE_RESOLUTION_FAILED);
-    }
-    else if (query_state == DeviceDispatcher::QUERY_COMPLETE &&
-             state() != QUERY_COMPLETE) {
-        state(QUERY_COMPLETE);
-    }
-
-    auto query_message = m_dispatcher->getQueryProbeMessage();
-    if (query_message.first) {
-        _can_out.write(query_message.second.toCAN());
-    }
-
     canbus::Message can;
     while (_can_in.read(can) == RTT::NewData) {
         auto msg = Message::fromCAN(can);
@@ -75,6 +61,20 @@ void CANTask::updateHook()
             _resolved_devices.write(d);
         }
         _messages.write(resolver_state.second);
+    }
+
+    auto query_state = m_dispatcher->getQueryState();
+    if (query_state == DeviceDispatcher::QUERY_TIMED_OUT) {
+        exception(DEVICE_RESOLUTION_FAILED);
+    }
+    else if (query_state == DeviceDispatcher::QUERY_COMPLETE &&
+             state() != QUERY_COMPLETE) {
+        state(QUERY_COMPLETE);
+    }
+
+    auto query_message = m_dispatcher->getQueryProbeMessage();
+    if (query_message.first) {
+        _can_out.write(query_message.second.toCAN());
     }
 
     CANTaskBase::updateHook();
