@@ -43,30 +43,39 @@ DeviceDispatcher::~DeviceDispatcher() {
 }
 
 void DeviceDispatcher::addPorts(RTT::TaskContext& task) {
-    map<string, RTT::OutputPort<Message>*> created_ports;
-    for (auto& p : m_dynamic_ports) {
+    for (auto const& p : m_dynamic_ports) {
         if (p.port) {
             throw invalid_argument(
                 "addPort: attempting to create new ports, but the existing ones "\
                 "have not yet been detached. Call #removePorts first"
             );
         }
+        else if (task.getPort(p.filter.name)) {
+            throw invalid_argument(
+                "addPort: attempting to create a port named '" + p.filter.name +
+                "' but it already exists on the interface of " + task.getName()
+            );
+        }
+    }
 
-        auto it = created_ports.find(p.filter.name);
-        if (it == created_ports.end()) {
+    for (auto& p : m_dynamic_ports) {
+        p.port = dynamic_cast<decltype(p.port)>(task.getPort(p.filter.name));
+        if (!p.port) {
             p.port = new RTT::OutputPort<Message>(p.filter.name);
-            created_ports[p.filter.name] = p.port;
+            task.provides()->addPort(*p.port);
         }
-        else {
-            p.port = it->second;
-        }
-        task.provides()->addPort(*p.port);
     }
 }
 
 void DeviceDispatcher::removePorts(RTT::TaskContext& task) {
-    for (auto const& p : m_dynamic_ports) {
-        task.provides()->removePort(p.filter.name);
+    for (auto& p : m_dynamic_ports) {
+        // Names can be shared across filters, make sure we haven't removed the
+        // port already
+        if (task.getPort(p.filter.name)) {
+            task.provides()->removePort(p.filter.name);
+            delete p.port;
+        }
+        p.port = nullptr;
     }
 }
 
