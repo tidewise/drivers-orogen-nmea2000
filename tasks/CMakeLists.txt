@@ -2,7 +2,7 @@
 
 include(nmea2000TaskLib)
 ADD_LIBRARY(${NMEA2000_TASKLIB_NAME} SHARED
-    ${NMEA2000_TASKLIB_SOURCES})
+    ${NMEA2000_TASKLIB_SOURCES} DeviceDispatcher.cpp)
 add_dependencies(${NMEA2000_TASKLIB_NAME}
     regen-typekit)
 

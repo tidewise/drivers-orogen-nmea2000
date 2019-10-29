@@ -9,24 +9,83 @@ using_task_library 'iodrivers_base'
 
 using_library 'nmea2000'
 import_types_from 'nmea2000/Message.hpp'
+import_types_from 'nmea2000/Receiver.hpp'
 import_types_from 'nmea2000Types.hpp'
 
 task_context 'CANTask' do
     needs_configuration
 
-    # The CAN messages
-    input_port 'can_in', '/canbus/Message'
+    # CAN message received by the bus
+    input_port('can_in', '/canbus/Message')
+        .needs_reliable_connection
 
-    # The NMEA2000 messages
-    output_port 'msg_out', '/nmea2000/Message'
+    # CAN messages sent to the bus
+    output_port 'can_out', '/canbus/Message'
+
+    # Whether we should continue enumerating devices even after the devices
+    # we do care about have been resolved
+    property 'continuous_device_enumeration', '/bool', false
+
+    # Expected devices with the name of the ports on which specific messages
+    # should be sent
+    property 'devices', '/std/vector</nmea2000/DeviceFilter>'
+
+    # How long the component should take before giving up on resolving
+    # devices listed in 'devices'. It transitions to DEVICE_RESOLUTION_FAILED
+    # when this timeout occurs
+    property 'resolution_timeout', '/base/Time'
+
+    # How long between the component queries product information when device
+    # resolution is needed
+    property 'enumeration_ack_timeout', '/base/Time'
+
+    # Dispatched messages as set up by the 'devices' property
+    dynamic_output_port(/\w+/, '/nmea2000/Message')
+
+    # All the received N2K messages
+    output_port 'messages', '/nmea2000/Message'
+
+    # Address claims
+    output_port 'device_information', '/nmea2000/Receiver/DeviceInfo'
+
+    # Devices listed in 'devices' that have been resolved to their bus ID
+    output_port 'resolved_devices', '/nmea2000/ResolvedDevice'
 
     port_driven
+
+    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE'
+
+    exception_states 'DEVICE_RESOLUTION_FAILED'
 end
 
 task_context 'ActisenseTask', subclasses: 'iodrivers_base::Task' do
     needs_configuration
 
-    output_port 'msg_out', '/nmea2000/Message'
+    # Expected devices with the name of the ports on which specific messages
+    # should be sent
+    property 'devices', '/std/vector</nmea2000/DeviceFilter>'
+
+    # How long the component should take before giving up on resolving
+    # devices listed in 'devices'. It transitions to DEVICE_RESOLUTION_FAILED
+    # when this timeout occurs
+    property 'resolution_timeout', '/base/Time'
+
+    # How long between the component queries product information when device
+    # resolution is needed
+    property 'enumeration_ack_timeout', '/base/Time'
+
+    # Dispatched messages as set up by the 'devices' property
+    dynamic_output_port(/\w+/, '/nmea2000/Message')
+
+    # All the received N2K messages
+    output_port 'messages', '/nmea2000/Message'
+
+    # Devices listed in 'devices' that have been resolved to their bus ID
+    output_port 'resolved_devices', '/nmea2000/ResolvedDevice'
+
+    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE'
+
+    exception_states 'DEVICE_RESOLUTION_FAILED'
 end
 
 task_context 'AISTask' do
@@ -34,23 +93,26 @@ task_context 'AISTask' do
 
     input_port 'msg_in', '/nmea2000/Message'
 
-    output_port 'position_samples', '/nmea2000/AISPosition'
-    output_port 'vessel_info_samples', '/nmea2000/AISVesselInformation'
+    output_port 'vessel_position', '/nmea2000/AISPosition'
+    output_port 'vessel_info', '/nmea2000/AISVesselInformation'
+    port_driven
 end
 
-task_context 'AirmarDepthSounder' do
+task_context 'AirmarDepthSounderTask' do
     needs_configuration
 
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'altitude_samples', '/base/samples/RigidBodyState'
     output_port 'quality_samples', '/nmea2000/AirmarAltitudeQuality'
+    port_driven
 end
 
-task_context 'FuelTankLevel' do
+task_context 'FluidLevelTask' do
     needs_configuration
 
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'level_out', '/nmea2000/FluidLevel'
+    port_driven
 end

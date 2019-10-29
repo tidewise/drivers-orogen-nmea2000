@@ -1,13 +1,13 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef NMEA2000_AIRMARDEPTHSOUNDER_TASK_HPP
-#define NMEA2000_AIRMARDEPTHSOUNDER_TASK_HPP
+#ifndef NMEA2000_FLUIDLEVELTASK_TASK_HPP
+#define NMEA2000_FLUIDLEVELTASK_TASK_HPP
 
-#include "nmea2000/AirmarDepthSounderBase.hpp"
+#include "nmea2000/FluidLevelTaskBase.hpp"
 
 namespace nmea2000{
 
-    /*! \class AirmarDepthSounder
+    /*! \class FluidLevelTask
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
@@ -16,28 +16,28 @@ namespace nmea2000{
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','nmea2000::AirmarDepthSounder')
+         task('custom_task_name','nmea2000::FluidLevelTask')
      end
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
-    class AirmarDepthSounder : public AirmarDepthSounderBase
+    class FluidLevelTask : public FluidLevelTaskBase
     {
-	friend class AirmarDepthSounderBase;
+	friend class FluidLevelTaskBase;
     protected:
 
 
 
     public:
-        /** TaskContext constructor for AirmarDepthSounder
+        /** TaskContext constructor for FluidLevelTask
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        AirmarDepthSounder(std::string const& name = "nmea2000::AirmarDepthSounder");
+        FluidLevelTask(std::string const& name = "nmea2000::FluidLevelTask");
 
-        /** Default deconstructor of AirmarDepthSounder
+        /** Default deconstructor of FluidLevelTask
          */
-	~AirmarDepthSounder();
+	~FluidLevelTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the

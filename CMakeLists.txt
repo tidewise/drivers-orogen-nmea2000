@@ -1,9 +1,8 @@
-PROJECT(nmea2000)
-cmake_minimum_required(VERSION 2.6)
+project(nmea2000)
+cmake_minimum_required(VERSION 3.5)
 
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/.orogen/config")
 INCLUDE(nmea2000Base)
 
-# FIND_PACKAGE(KDL)
-# FIND_PACKAGE(OCL)
-
+find_package(Rock)
+add_subdirectory(test)

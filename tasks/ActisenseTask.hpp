@@ -1,43 +1,51 @@
-/* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
-
 #ifndef NMEA2000_ACTISENSETASK_TASK_HPP
 #define NMEA2000_ACTISENSETASK_TASK_HPP
 
 #include "nmea2000/ActisenseTaskBase.hpp"
 
 namespace nmea2000{
+    class ActisenseDriver;
+    class DeviceDispatcher;
 
     /*! \class ActisenseTask
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
+     * \brief The task context provides and requires services. It uses an
+     * ExecutionEngine to perform its functions. Essential interfaces are
+     * operations, data flow ports and properties. These interfaces have been
+     * defined using the oroGen specification. In order to modify the
+     * interfaces you should (re)use oroGen and rely on the associated
+     * workflow.
+     *
      * \details
+     *
      * The name of a TaskContext is primarily defined via:
-     \verbatim
-     deployment 'deployment_name'
-         task('custom_task_name','nmea2000::ActisenseTask')
-     end
-     \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     * \verbatim
+     * deployment 'deployment_name'
+     *     task('custom_task_name','nmea2000::ActisenseTask')
+     * end
+     * \endverbatim
+     *
+     * It can be dynamically adapted when the deployment is called with a
+     * prefix argument.
      */
     class ActisenseTask : public ActisenseTaskBase
     {
-	friend class ActisenseTaskBase;
+        friend class ActisenseTaskBase;
     protected:
-
-
+        std::unique_ptr<ActisenseDriver> m_driver;
+        std::unique_ptr<DeviceDispatcher> m_dispatcher;
 
     public:
         /** TaskContext constructor for ActisenseTask
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param name Name of the task. This name needs to be unique to make
+         *      it identifiable via nameservices.
+         * \param initial_state The initial TaskState of the TaskContext.
+         *      Default is Stopped state.
          */
         ActisenseTask(std::string const& name = "nmea2000::ActisenseTask");
 
         /** Default deconstructor of ActisenseTask
          */
-	~ActisenseTask();
+        ~ActisenseTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -78,6 +86,10 @@ namespace nmea2000{
          */
         void updateHook();
 
+        /** Method called when there is I/O available on the underlying device
+         */
+        void processIO();
+
         /** This hook is called by Orocos when the component is in the
          * RunTimeError state, at each activity step. See the discussion in
          * updateHook() about triggering options.
@@ -100,4 +112,3 @@ namespace nmea2000{
 }
 
 #endif
-
