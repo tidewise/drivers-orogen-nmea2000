@@ -50,7 +50,13 @@ void AISTask::updateHook()
             position_out.yaw = base::Angle::fromDeg(in.heading);
             position_out.yaw_velocity = in.rate_of_turn * M_PI / 180;
             position_out.speed_over_ground = in.sog;
-            _vessel_position.write(position_out);
+
+            // Filter out what looks like uninitialized messages. I never
+            // received uninitialized class A messages, but did receive class B
+            // messages, so I added this check here too.
+            if (position_out.mmsi != 0) {
+                _vessel_position.write(position_out);
+            }
         }
         else if (pgns::AISClassBPositionReport::ID == msg.pgn) {
             pgns::AISClassBPositionReport in =
@@ -64,7 +70,12 @@ void AISTask::updateHook()
             position_out.high_accuracy_position = (in.position_accuracy == 1);
             position_out.yaw = base::Angle::fromDeg(in.heading);
             position_out.speed_over_ground = in.sog;
-            _vessel_position.write(position_out);
+
+            // Filter out what looks like uninitialized Class B messages. Was
+            // receiving those at the office.
+            if (position_out.mmsi != 0) {
+                _vessel_position.write(position_out);
+            }
         }
         else if (pgns::AISClassBExtendedPositionReport::ID == msg.pgn) {
             pgns::AISClassBExtendedPositionReport in =
