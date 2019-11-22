@@ -91,6 +91,7 @@ task_context 'AISTask' do
 
     output_port 'vessel_position', '/nmea2000/AISPosition'
     output_port 'vessel_information', '/nmea2000/AISVesselInformation'
+    output_port 'voyage_information', '/nmea2000/AISVoyageInformation'
     port_driven
 end
 

@@ -82,13 +82,20 @@ namespace nmea2000 {
         std::string name;
         int ship_type = 0;
         int position_device_type = 0;
-        float draught = base::unknown<float>();
+        float draft = base::unknown<float>();
         float length = base::unknown<float>();
         float width = base::unknown<float>();
-        float gross_weight = base::unknown<float>();
-        float dead_weight = base::unknown<float>();
 
         base::Vector3d reference_position;
+    };
+
+    /** Representation of the voyage data stored in AIS Messages */
+    struct AISVoyageInformation {
+        base::Time time;
+
+        int imo = 0;
+        base::Time eta;
+        std::string destination;
     };
 
     /** Measurement quality factor reported by Airmar depth sounders */

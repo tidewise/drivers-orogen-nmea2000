@@ -95,6 +95,40 @@ void AISTask::updateHook()
                                 0);
             _vessel_information.write(info_out);
         }
+        else if (pgns::AISClassAStaticAndVoyageRelatedData::ID == msg.pgn) {
+            pgns::AISClassAStaticAndVoyageRelatedData in =
+                pgns::AISClassAStaticAndVoyageRelatedData::fromMessage(msg);
+
+            AISVesselInformation info_out;
+            info_out.time = in.time;
+            info_out.mmsi = in.user_id;
+            info_out.imo = in.imo_number;
+            info_out.name = in.name;
+            info_out.call_sign = in.callsign;
+            info_out.length = in.length;
+            info_out.width = in.beam;
+            info_out.draft = in.draft;
+            info_out.ship_type = in.type_of_ship;
+            info_out.position_device_type = in.gnss_type;
+            info_out.reference_position =
+                Eigen::Vector3d(in.position_reference_from_bow,
+                                -in.position_reference_from_starboard,
+                                0);
+            _vessel_information.write(info_out);
+
+            AISVoyageInformation voyage_out;
+            voyage_out.time = in.time;
+            voyage_out.imo = in.imo_number;
+            // This does not take into account leap seconds, but given the low
+            // criticality of this information, I didn't try to solve that
+            // particular hairy problem
+            voyage_out.eta = base::Time::fromMilliseconds(
+                (static_cast<uint64_t>(in.eta_date) * 3600 * 24 +
+                 static_cast<uint64_t>(in.eta_time)) * 1000
+            );
+            voyage_out.destination = in.destination;
+            _voyage_information.write(voyage_out);
+        }
 
     }
     AISTaskBase::updateHook();
