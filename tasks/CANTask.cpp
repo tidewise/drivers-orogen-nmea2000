@@ -65,8 +65,9 @@ void CANTask::updateHook()
     }
 
     auto query_state = m_dispatcher->getQueryState();
-    if (query_state == DeviceDispatcher::QUERY_TIMED_OUT) {
-        exception(DEVICE_RESOLUTION_FAILED);
+    if (query_state == DeviceDispatcher::QUERY_TIMED_OUT &&
+        state() != QUERY_TIMED_OUT) {
+        state(QUERY_TIMED_OUT);
     }
     else if (query_state == DeviceDispatcher::QUERY_COMPLETE &&
              state() != QUERY_COMPLETE) {
