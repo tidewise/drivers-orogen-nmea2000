@@ -93,7 +93,7 @@ void AISTask::updateHook()
                 Eigen::Vector3d(in.position_reference_from_bow,
                                 -in.position_reference_from_starboard,
                                 0);
-            _vessel_info.write(info_out);
+            _vessel_information.write(info_out);
         }
 
     }
