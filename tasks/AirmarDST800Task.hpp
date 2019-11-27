@@ -1,13 +1,13 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef NMEA2000_AIRMARDEPTHSOUNDERTASK_TASK_HPP
-#define NMEA2000_AIRMARDEPTHSOUNDERTASK_TASK_HPP
+#ifndef NMEA2000_AIRMARDST800TASK_TASK_HPP
+#define NMEA2000_AIRMARDST800TASK_TASK_HPP
 
-#include "nmea2000/AirmarDepthSounderTaskBase.hpp"
+#include "nmea2000/AirmarDST800TaskBase.hpp"
 
 namespace nmea2000{
 
-    /*! \class AirmarDepthSounderTask
+    /*! \class AirmarDST800Task
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
@@ -16,28 +16,28 @@ namespace nmea2000{
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','nmea2000::AirmarDepthSounderTask')
+         task('custom_task_name','nmea2000::AirmarDST800Task')
      end
      \endverbatim
      *  It can be dynamically adapted when the deployment is called with a prefix argument.
      */
-    class AirmarDepthSounderTask : public AirmarDepthSounderTaskBase
+    class AirmarDST800Task : public AirmarDST800TaskBase
     {
-	friend class AirmarDepthSounderTaskBase;
+	friend class AirmarDST800TaskBase;
     protected:
 
 
 
     public:
-        /** TaskContext constructor for AirmarDepthSounderTask
+        /** TaskContext constructor for AirmarDST800Task
          * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
          * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
          */
-        AirmarDepthSounderTask(std::string const& name = "nmea2000::AirmarDepthSounderTask");
+        AirmarDST800Task(std::string const& name = "nmea2000::AirmarDST800Task");
 
-        /** Default deconstructor of AirmarDepthSounderTask
+        /** Default deconstructor of AirmarDST800Task
          */
-	~AirmarDepthSounderTask();
+	~AirmarDST800Task();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
