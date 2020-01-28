@@ -4,6 +4,7 @@ name 'nmea2000'
 
 import_types_from 'std'
 import_types_from 'canbus'
+import_types_from 'ais_base'
 
 using_task_library 'iodrivers_base'
 
@@ -89,9 +90,9 @@ task_context 'AISTask' do
 
     input_port 'msg_in', '/nmea2000/Message'
 
-    output_port 'vessel_position', '/nmea2000/AISPosition'
-    output_port 'vessel_information', '/nmea2000/AISVesselInformation'
-    output_port 'voyage_information', '/nmea2000/AISVoyageInformation'
+    output_port 'vessel_position', '/ais_base/Position'
+    output_port 'vessel_information', '/ais_base/VesselInformation'
+    output_port 'voyage_information', '/ais_base/VoyageInformation'
     port_driven
 end
 
