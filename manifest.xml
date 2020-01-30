@@ -9,6 +9,7 @@
   <depend package="base/cmake" />
   <depend package="drivers/orogen/canbus" />
   <depend package="drivers/nmea2000" />
+  <depend package="drivers/orogen/ais_base" />
   <depend package="drivers/orogen/iodrivers_base" />
   <test_depend package="google-test" />
 </package>
