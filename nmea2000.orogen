@@ -31,8 +31,8 @@ task_context 'CANTask' do
     property 'devices', '/std/vector</nmea2000/DeviceFilter>'
 
     # How long the component should take before giving up on resolving
-    # devices listed in 'devices'. It transitions to DEVICE_RESOLUTION_FAILED
-    # when this timeout occurs
+    # devices listed in 'devices'. The component emits the QUERY_TIMED_OUT
+    # event when it occurs, but continues operation
     property 'resolution_timeout', '/base/Time'
 
     # How long between the component queries product information when device
@@ -53,9 +53,7 @@ task_context 'CANTask' do
 
     port_driven
 
-    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE'
-
-    exception_states 'DEVICE_RESOLUTION_FAILED'
+    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE', 'QUERY_TIMED_OUT'
 end
 
 task_context 'ActisenseTask', subclasses: 'iodrivers_base::Task' do
@@ -66,8 +64,8 @@ task_context 'ActisenseTask', subclasses: 'iodrivers_base::Task' do
     property 'devices', '/std/vector</nmea2000/DeviceFilter>'
 
     # How long the component should take before giving up on resolving
-    # devices listed in 'devices'. It transitions to DEVICE_RESOLUTION_FAILED
-    # when this timeout occurs
+    # devices listed in 'devices'. The component emits the QUERY_TIMED_OUT
+    # event when it occurs, but continues operation
     property 'resolution_timeout', '/base/Time'
 
     # How long between the component queries product information when device
@@ -83,9 +81,7 @@ task_context 'ActisenseTask', subclasses: 'iodrivers_base::Task' do
     # Devices listed in 'devices' that have been resolved to their bus ID
     output_port 'resolved_devices', '/nmea2000/ResolvedDevice'
 
-    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE'
-
-    exception_states 'DEVICE_RESOLUTION_FAILED'
+    runtime_states 'QUERY_IN_PROGRESS', 'QUERY_COMPLETE', 'QUERY_TIMED_OUT'
 end
 
 task_context 'AISTask' do
