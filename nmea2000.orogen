@@ -98,13 +98,18 @@ task_context 'AISTask' do
     port_driven
 end
 
-task_context 'AirmarDepthSounderTask' do
+task_context 'AirmarDST800Task' do
     needs_configuration
 
     input_port 'msg_in', '/nmea2000/Message'
 
-    output_port 'altitude_samples', '/base/samples/RigidBodyState'
-    output_port 'quality_samples', '/nmea2000/AirmarAltitudeQuality'
+    property 'sensor_frame', 'string', 'depth_sounder'
+    property 'water_frame', 'string', 'water'
+    property 'ground_frame', 'string', 'ground'
+
+    output_port 'speed_samples', '/base/samples/RigidBodyState'
+    output_port 'depth_samples', '/base/samples/RigidBodyState'
+    output_port 'temperature_samples', '/base/Temperature'
     port_driven
 end
 
