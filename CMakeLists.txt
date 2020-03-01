@@ -5,4 +5,7 @@ SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/.orogen/config")
 INCLUDE(nmea2000Base)
 
 find_package(Rock)
-add_subdirectory(test)
+if (ROCK_TEST_ENABLED)
+    enable_testing()
+    add_subdirectory(test)
+endif()
