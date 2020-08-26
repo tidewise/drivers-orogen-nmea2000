@@ -37,10 +37,9 @@ void FluidLevelTask::updateHook()
     while (_msg_in.read(msg) == RTT::NewData) {
         if (msg.pgn == pgns::FluidLevel::ID) {
             auto in = pgns::FluidLevel::fromMessage(msg);
-            FluidLevel out;
+            tank_base::FluidLevel out;
             out.time = in.time;
-            out.level = in.level;
-            out.capacity = in.capacity;
+            out.currentLevel = in.level / in.capacity;
             _level_out.write(out);
         }
     }

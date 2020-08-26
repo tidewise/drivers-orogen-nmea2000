@@ -21,13 +21,6 @@ namespace nmea2000 {
         uint8_t bus_id;
     };
 
-    struct FluidLevel {
-        base::Time time;
-
-        float level = base::unknown<float>();
-        float capacity = base::unknown<float>();
-    };
-
     /** Measurement quality factor reported by Airmar depth sounders */
     struct AirmarAltitudeQuality {
         base::Time time;

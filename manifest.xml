@@ -11,5 +11,6 @@
   <depend package="drivers/nmea2000" />
   <depend package="drivers/orogen/ais_base" />
   <depend package="drivers/orogen/iodrivers_base" />
+  <depend package="drivers/orogen/tank_base" />
   <test_depend package="google-test" />
 </package>
