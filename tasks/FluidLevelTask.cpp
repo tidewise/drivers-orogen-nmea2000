@@ -33,13 +33,15 @@ bool FluidLevelTask::startHook()
 }
 void FluidLevelTask::updateHook()
 {
+    float capacity = _capacity.get();
+
     nmea2000::Message msg;
     while (_msg_in.read(msg) == RTT::NewData) {
         if (msg.pgn == pgns::FluidLevel::ID) {
             auto in = pgns::FluidLevel::fromMessage(msg);
             tank_base::FluidLevel out;
             out.time = in.time;
-            out.currentLevel = in.level / in.capacity;
+            out.currentLevel = in.level / (capacity ? capacity : in.capacity);
             _level_out.write(out);
         }
     }

@@ -116,6 +116,11 @@ end
 task_context 'FluidLevelTask' do
     needs_configuration
 
+    # Override the capacity coming from the NMEA2000 device
+    #
+    # It is used instead of the device-reported capacity if non-zero
+    property "capacity", "/float", 0
+
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'level_out', '/tank_base/FluidLevel'
