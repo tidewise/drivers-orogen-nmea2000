@@ -4,6 +4,7 @@
 #define NMEA2000_AIRMARDST800TASK_TASK_HPP
 
 #include "nmea2000/AirmarDST800TaskBase.hpp"
+#include <base/Float.hpp>
 
 namespace nmea2000{
 
@@ -11,7 +12,7 @@ namespace nmea2000{
      * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
      * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
      * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
+     *
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
@@ -25,8 +26,7 @@ namespace nmea2000{
     {
 	friend class AirmarDST800TaskBase;
     protected:
-
-
+        float mRange = base::unknown<float>();
 
     public:
         /** TaskContext constructor for AirmarDST800Task

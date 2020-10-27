@@ -28,6 +28,8 @@ bool AirmarDST800Task::startHook()
     if (! AirmarDST800TaskBase::startHook()) {
         return false;
     }
+
+    mRange = _range.get();
     return true;
 }
 void AirmarDST800Task::updateHook()
@@ -39,9 +41,12 @@ void AirmarDST800Task::updateHook()
                 pgns::WaterDepth::fromMessage(msg);
             base::samples::RigidBodyState out;
             out.time = in.time;
-            if (in.depth < in.range) {
+
+            double range = base::isUnknown(mRange) ? in.range : mRange;
+            if (in.depth < range) {
                 out.position.z() = in.depth;
             }
+
             out.sourceFrame = _ground_frame.get();
             out.targetFrame = _sensor_frame.get();
             _depth_samples.write(out);
