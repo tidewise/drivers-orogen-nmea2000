@@ -31,6 +31,14 @@ namespace nmea2000 {
          */
         float quality_factor;
     };
+
+    /** Relative Humidity Measurement provided by the Yatch YDHS-01 sensor*/
+    struct Humidity{
+        base::Time time;
+
+        /** Humidity level, from 0..1*/
+        float value;
+    };
 }
 
 #endif

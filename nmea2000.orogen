@@ -15,6 +15,10 @@ import_types_from 'nmea2000/Message.hpp'
 import_types_from 'nmea2000/Receiver.hpp'
 import_types_from 'nmea2000Types.hpp'
 
+typekit do
+    export_types "/nmea2000/Humidity"
+end
+
 task_context 'CANTask' do
     needs_configuration
 
