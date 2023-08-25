@@ -135,3 +135,13 @@ task_context 'FluidLevelTask' do
     output_port 'level_out', '/tank_base/FluidLevel'
     port_driven
 end
+
+task_context 'YatchYDHS01Task' do
+    needs_configuration
+
+    input_port 'msg_in', '/nmea2000/Message'
+
+    output_port 'temperature', '/base/samples/Temperature'
+    output_port 'relative_humidity', '/nmea2000/Humidity'
+    port_driven
+end
