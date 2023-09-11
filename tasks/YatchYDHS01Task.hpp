@@ -5,13 +5,16 @@
 
 #include "nmea2000/YatchYDHS01TaskBase.hpp"
 
-namespace nmea2000{
+namespace nmea2000 {
 
     /*! \class YatchYDHS01Task
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
+     * \brief The task context provides and requires services. It uses an ExecutionEngine
+     to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These
+     interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the
+     associated workflow.
+     *
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
@@ -19,25 +22,24 @@ namespace nmea2000{
          task('custom_task_name','nmea2000::YatchYDHS01Task')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     *  It can be dynamically adapted when the deployment is called with a prefix
+     argument.
      */
-    class YatchYDHS01Task : public YatchYDHS01TaskBase
-    {
-	friend class YatchYDHS01TaskBase;
+    class YatchYDHS01Task : public YatchYDHS01TaskBase {
+        friend class YatchYDHS01TaskBase;
+
     protected:
-
-
-
     public:
         /** TaskContext constructor for YatchYDHS01Task
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param name Name of the task. This name needs to be unique to make it
+         * identifiable via nameservices. \param initial_state The initial TaskState of
+         * the TaskContext. Default is Stopped state.
          */
         YatchYDHS01Task(std::string const& name = "nmea2000::YatchYDHS01Task");
 
         /** Default deconstructor of YatchYDHS01Task
          */
-	~YatchYDHS01Task();
+        ~YatchYDHS01Task();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -100,4 +102,3 @@ namespace nmea2000{
 }
 
 #endif
-
