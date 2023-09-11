@@ -37,27 +37,28 @@ void YatchYDHS01Task::updateHook()
     Message msg;
     while (_msg_in.read(msg) == RTT::NewData) {
         switch (msg.pgn) {
-            case pgns::TemperatureExtendedRange::ID:
+            case pgns::TemperatureExtendedRange::ID: {
                 pgns::TemperatureExtendedRange in =
                     pgns::TemperatureExtendedRange::fromMessage(msg);
 
-                if (in.temperature_source == id) {
+                if (in.temperature_source == _id) {
                     base::samples::Temperature temperature_out =
                         base::samples::Temperature::fromCelsius(in.time,
                             in.actual_temperature);
                     _temperature.write(temperature_out);
                 }
-                break;
-            case pgns::Humidity::ID:
+            } break;
+
+            case pgns::Humidity::ID: {
                 pgns::Humidity in = pgns::Humidity::fromMessage(msg);
 
-                if (in.humidity_source == id) {
+                if (in.humidity_source == _id) {
                     Humidity humidity_out;
                     humidity_out.time = in.time;
                     humidity_out.value = in.actual_humidity / 100.0;
                     _relative_humidity.write(humidity_out);
                 }
-                break;
+            } break;
         }
     }
 }
