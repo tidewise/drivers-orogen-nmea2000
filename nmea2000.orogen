@@ -139,6 +139,8 @@ end
 task_context 'YatchYDHS01Task' do
     needs_configuration
 
+    property "id", "/int"
+
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'temperature', '/base/samples/Temperature'
