@@ -43,7 +43,7 @@ void YatchYDHS01Task::updateHook()
 
                 if (in.temperature_source == id) {
                 base::samples::Temperature temperature_out =
-                    base::samples::Temperature::fromCelsius(in.time, in.temperature);
+                    base::samples::Temperature::fromCelsius(in.time, in.actual_temperature);
                 _temperature.write(temperature_out);
                 }
                 break;
@@ -54,7 +54,7 @@ void YatchYDHS01Task::updateHook()
                 if (in.humidity_source == id) {
                     Humidity humidity_out;
                     humidity_out.time = in.time;
-                    humidity_out.value = in.humidity / 100.0;
+                    humidity_out.value = in.actual_humidity / 100.0;
                     _relative_humidity.write(humidity_out);
                 }
                 break;
