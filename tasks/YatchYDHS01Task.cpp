@@ -41,10 +41,26 @@ void YatchYDHS01Task::updateHook()
                 pgns::Temperature in = pgns::Temperature::fromMessage(msg);
 
                 if (in.temperature_instance == _id) {
-                    base::samples::Temperature temperature_out =
-                        base::samples::Temperature::fromCelsius(in.time,
-                            in.actual_temperature);
-                    _temperature.write(temperature_out);
+                    switch (in.temperature_source) {
+                        // Checks if this received temperature is the outside temperature
+                        // or if it's a dew point temperature and writes it on the
+                        // correct output port.
+                        // According to the PGN:
+                        // 1 => OUTSIDE TEMPERATURE (DEFAULT)
+                        // 9 => DEW POINT TEMPERATURE
+                        case 1: {
+                            base::samples::Temperature temperature_out =
+                                base::samples::Temperature::fromCelsius(in.time,
+                                    in.actual_temperature);
+                            _temperature.write(temperature_out);
+                        } break;
+                        case 9: {
+                            base::samples::Temperature temperature_out =
+                                base::samples::Temperature::fromCelsius(in.time,
+                                    in.actual_temperature);
+                            _dew_temperature.write(temperature_out);
+                        } break;
+                    }
                 }
             } break;
 
@@ -56,7 +72,8 @@ void YatchYDHS01Task::updateHook()
 
                     humidity_out.time = in.time;
 
-                    humidity_out.value = static_cast<int>(in.actual_humidity) * 0.004 / 100;
+                    humidity_out.value =
+                        static_cast<int>(in.actual_humidity) * 0.004 / 100;
                     _relative_humidity.write(humidity_out);
                 }
             } break;

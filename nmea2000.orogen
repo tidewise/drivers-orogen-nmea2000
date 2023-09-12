@@ -145,5 +145,6 @@ task_context 'YatchYDHS01Task' do
 
     output_port 'temperature', '/base/samples/Temperature'
     output_port 'relative_humidity', '/nmea2000/Humidity'
+    output_port 'dew_temperature', '/base/samples/Temperature'
     port_driven
 end
