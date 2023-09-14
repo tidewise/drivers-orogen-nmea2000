@@ -37,6 +37,20 @@ void YatchYDHS01Task::updateHook()
     Message msg;
     while (_msg_in.read(msg) == RTT::NewData) {
         switch (msg.pgn) {
+            case pgns::Humidity::ID: {
+                pgns::Humidity in = pgns::Humidity::fromMessage(msg);
+
+                if (in.humidity_instance == _id) {
+                    Humidity humidity_out;
+
+                    humidity_out.time = in.time;
+
+                    humidity_out.value =
+                        static_cast<int>(in.actual_humidity) * 0.004 / 100;
+                    _relative_humidity.write(humidity_out);
+                }
+            } break;
+
             case pgns::Temperature::ID: {
                 pgns::Temperature in = pgns::Temperature::fromMessage(msg);
 
@@ -61,20 +75,6 @@ void YatchYDHS01Task::updateHook()
                             _dew_temperature.write(temperature_out);
                         } break;
                     }
-                }
-            } break;
-
-            case pgns::Humidity::ID: {
-                pgns::Humidity in = pgns::Humidity::fromMessage(msg);
-
-                if (in.humidity_instance == _id) {
-                    Humidity humidity_out;
-
-                    humidity_out.time = in.time;
-
-                    humidity_out.value =
-                        static_cast<int>(in.actual_humidity) * 0.004 / 100;
-                    _relative_humidity.write(humidity_out);
                 }
             } break;
         }
