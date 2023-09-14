@@ -4,6 +4,7 @@
 #define NMEA2000_YATCHYDHS01TASK_TASK_HPP
 
 #include "nmea2000/YatchYDHS01TaskBase.hpp"
+#include <nmea2000/PGNs.hpp>
 
 namespace nmea2000 {
 
@@ -98,6 +99,10 @@ namespace nmea2000 {
          * before calling start() again.
          */
         void cleanupHook();
+    private:
+        uint8_t m_id;
+        void updateHumidity(pgns::Humidity humidity_in);
+        void updateTemperature(pgns::Temperature temperature_in);
     };
 }
 

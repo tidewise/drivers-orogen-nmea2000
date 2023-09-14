@@ -14,6 +14,32 @@ YatchYDHS01Task::~YatchYDHS01Task()
 {
 }
 
+void YatchYDHS01Task::updateHumidity(pgns::Humidity humidity_in)
+{
+    Humidity humidity_out;
+    humidity_out.time = humidity_in.time;
+    humidity_out.value = static_cast<int>(humidity_in.actual_humidity) * 0.004 / 100;
+    _relative_humidity.write(humidity_out);
+}
+
+void YatchYDHS01Task::updateTemperature(pgns::Temperature temperature_in)
+{
+    base::samples::Temperature temperature_out;
+    temperature_out = base::samples::Temperature::fromCelsius(temperature_in.time,
+        temperature_in.actual_temperature);
+    // Checks if this received temperature is the outside temperature
+    // or if it's a dew point temperature and writes it on the
+    // correct output port. According to the PGN:
+    // 1 => OUTSIDE TEMPERATURE (DEFAULT)
+    // 9 => DEW POINT TEMPERATURE
+    if (temperature_in.temperature_source == 1) {
+        _temperature.write(temperature_out);
+    }
+    else if (temperature_in.temperature_source == 9) {
+        _dew_temperature.write(temperature_out);
+    }
+}
+
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See YatchYDHS01Task.hpp for more detailed
 // documentation about them.
@@ -22,6 +48,7 @@ bool YatchYDHS01Task::configureHook()
 {
     if (!YatchYDHS01TaskBase::configureHook())
         return false;
+    m_id = _id.get();
     return true;
 }
 bool YatchYDHS01Task::startHook()
@@ -36,50 +63,21 @@ void YatchYDHS01Task::updateHook()
 
     Message msg;
     while (_msg_in.read(msg) == RTT::NewData) {
-        switch (msg.pgn) {
-            case pgns::Humidity::ID: {
-                pgns::Humidity in = pgns::Humidity::fromMessage(msg);
-
-                if (in.humidity_instance == _id) {
-                    Humidity humidity_out;
-
-                    humidity_out.time = in.time;
-
-                    humidity_out.value =
-                        static_cast<int>(in.actual_humidity) * 0.004 / 100;
-                    _relative_humidity.write(humidity_out);
-                }
-            } break;
-
-            case pgns::Temperature::ID: {
-                pgns::Temperature in = pgns::Temperature::fromMessage(msg);
-
-                if (in.temperature_instance == _id) {
-                    switch (in.temperature_source) {
-                        // Checks if this received temperature is the outside temperature
-                        // or if it's a dew point temperature and writes it on the
-                        // correct output port.
-                        // According to the PGN:
-                        // 1 => OUTSIDE TEMPERATURE (DEFAULT)
-                        // 9 => DEW POINT TEMPERATURE
-                        case 1: {
-                            base::samples::Temperature temperature_out =
-                                base::samples::Temperature::fromCelsius(in.time,
-                                    in.actual_temperature);
-                            _temperature.write(temperature_out);
-                        } break;
-                        case 9: {
-                            base::samples::Temperature temperature_out =
-                                base::samples::Temperature::fromCelsius(in.time,
-                                    in.actual_temperature);
-                            _dew_temperature.write(temperature_out);
-                        } break;
-                    }
-                }
-            } break;
+        if (msg.pgn == pgns::Humidity::ID) {
+            pgns::Humidity in = pgns::Humidity::fromMessage(msg);
+            if (in.humidity_instance == m_id) {
+                updateHumidity(in);
+            }
+        }
+        else if (msg.pgn == pgns::Temperature::ID) {
+            pgns::Temperature in = pgns::Temperature::fromMessage(msg);
+            if (in.temperature_instance == m_id) {
+                updateTemperature(in);
+            }
         }
     }
 }
+
 void YatchYDHS01Task::errorHook()
 {
     YatchYDHS01TaskBase::errorHook();
