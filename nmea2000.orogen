@@ -94,7 +94,8 @@ end
 task_context 'AISTask' do
     needs_configuration
 
-    input_port 'msg_in', '/nmea2000/Message'
+    input_port('msg_in', '/nmea2000/Message')
+        .needs_reliable_connection
 
     output_port 'vessel_position', '/ais_base/Position'
     output_port 'vessel_information', '/ais_base/VesselInformation'
@@ -105,7 +106,8 @@ end
 task_context 'AirmarDST800Task' do
     needs_configuration
 
-    input_port 'msg_in', '/nmea2000/Message'
+    input_port('msg_in', '/nmea2000/Message')
+        .needs_reliable_connection
 
     property 'sensor_frame', 'string', 'depth_sounder'
     property 'water_frame', 'string', 'water'
@@ -133,5 +135,19 @@ task_context 'FluidLevelTask' do
     input_port 'msg_in', '/nmea2000/Message'
 
     output_port 'level_out', '/tank_base/FluidLevel'
+    port_driven
+end
+
+task_context 'YatchYDHS01Task' do
+    needs_configuration
+
+    property "id", "/int"
+
+    input_port('msg_in', '/nmea2000/Message')
+        .needs_reliable_connection
+
+    output_port 'temperature', '/base/samples/Temperature'
+    output_port 'relative_humidity', '/nmea2000/Humidity'
+    output_port 'dew_temperature', '/base/samples/Temperature'
     port_driven
 end
