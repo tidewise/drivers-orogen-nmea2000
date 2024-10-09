@@ -5,6 +5,7 @@ name 'nmea2000'
 import_types_from 'std'
 
 import_types_from 'ais_base'
+import_types_from "gps_base"
 import_types_from 'canbus'
 import_types_from 'tank_base'
 
@@ -149,5 +150,18 @@ task_context 'YatchYDHS01Task' do
     output_port 'temperature', '/base/samples/Temperature'
     output_port 'relative_humidity', '/nmea2000/Humidity'
     output_port 'dew_temperature', '/base/samples/Temperature'
+    port_driven
+end
+
+task_context 'IcomM510Task' do
+    needs_configuration
+
+    input_port('msg_in', '/nmea2000/Message')
+        .needs_reliable_connection
+
+    output_port 'vessel_position', '/ais_base/Position'
+    output_port 'vessel_information', '/ais_base/VesselInformation'
+    output_port 'voyage_information', '/ais_base/VoyageInformation'
+    output_port "gps_solution", "/gps_base/Solution"
     port_driven
 end
