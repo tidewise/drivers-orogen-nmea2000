@@ -55,8 +55,8 @@ void AirmarDST800Task::updateHook()
             pgns::EnvironmentalParametersExt in =
                 pgns::EnvironmentalParametersExt::fromMessage(msg);
 
-            base::Temperature temperature =
-                base::Temperature::fromCelsius(in.temperature);
+            auto temperature = base::samples::Temperature::fromCelsius(base::Time::now(),
+                in.temperature);
             _temperature_samples.write(temperature);
         }
         else if (msg.pgn == pgns::Speed::ID) {
