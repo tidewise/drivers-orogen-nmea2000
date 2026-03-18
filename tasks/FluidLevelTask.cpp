@@ -6,12 +6,13 @@
 using namespace nmea2000;
 
 FluidLevelTask::FluidLevelTask(std::string const& name)
-    : FluidLevelTaskBase(name) {
+    : FluidLevelTaskBase(name)
+{
 }
 
-FluidLevelTask::~FluidLevelTask() {
+FluidLevelTask::~FluidLevelTask()
+{
 }
-
 
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See FluidLevelTask.hpp for more detailed
@@ -19,14 +20,15 @@ FluidLevelTask::~FluidLevelTask() {
 
 bool FluidLevelTask::configureHook()
 {
-    if (! FluidLevelTaskBase::configureHook()) {
+    if (!FluidLevelTaskBase::configureHook()) {
         return false;
     }
+    m_instance_id = _instance_id.get();
     return true;
 }
 bool FluidLevelTask::startHook()
 {
-    if (! FluidLevelTaskBase::startHook()) {
+    if (!FluidLevelTaskBase::startHook()) {
         return false;
     }
     return true;
@@ -39,10 +41,12 @@ void FluidLevelTask::updateHook()
     while (_msg_in.read(msg) == RTT::NewData) {
         if (msg.pgn == pgns::FluidLevel::ID) {
             auto in = pgns::FluidLevel::fromMessage(msg);
-            tank_base::FluidLevel out;
-            out.time = in.time;
-            out.currentLevel = in.level / (capacity ? capacity : in.capacity);
-            _level_out.write(out);
+            if (m_instance_id == -1 || in.instance == m_instance_id) {
+                tank_base::FluidLevel out;
+                out.time = in.time;
+                out.currentLevel = in.level / (capacity ? capacity : in.capacity);
+                _level_out.write(out);
+            }
         }
     }
     FluidLevelTaskBase::updateHook();

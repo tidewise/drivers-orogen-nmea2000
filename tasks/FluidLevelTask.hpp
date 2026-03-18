@@ -5,13 +5,16 @@
 
 #include "nmea2000/FluidLevelTaskBase.hpp"
 
-namespace nmea2000{
+namespace nmea2000 {
 
     /*! \class FluidLevelTask
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
+     * \brief The task context provides and requires services. It uses an ExecutionEngine
+     to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These
+     interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the
+     associated workflow.
+     *
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
@@ -19,25 +22,27 @@ namespace nmea2000{
          task('custom_task_name','nmea2000::FluidLevelTask')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     *  It can be dynamically adapted when the deployment is called with a prefix
+     argument.
      */
-    class FluidLevelTask : public FluidLevelTaskBase
-    {
-	friend class FluidLevelTaskBase;
+    class FluidLevelTask : public FluidLevelTaskBase {
+        friend class FluidLevelTaskBase;
+
     protected:
-
-
+    private:
+        int m_instance_id;
 
     public:
         /** TaskContext constructor for FluidLevelTask
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param name Name of the task. This name needs to be unique to make it
+         * identifiable via nameservices. \param initial_state The initial TaskState of
+         * the TaskContext. Default is Stopped state.
          */
         FluidLevelTask(std::string const& name = "nmea2000::FluidLevelTask");
 
         /** Default deconstructor of FluidLevelTask
          */
-	~FluidLevelTask();
+        ~FluidLevelTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -100,4 +105,3 @@ namespace nmea2000{
 }
 
 #endif
-
