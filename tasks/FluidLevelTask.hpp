@@ -30,6 +30,7 @@ namespace nmea2000 {
 
     protected:
     private:
+        static const int ANY_INSTANCE_ID = -1;
         int m_instance_id;
 
     public:

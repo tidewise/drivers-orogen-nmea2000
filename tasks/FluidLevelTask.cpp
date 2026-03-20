@@ -41,11 +41,14 @@ void FluidLevelTask::updateHook()
     while (_msg_in.read(msg) == RTT::NewData) {
         if (msg.pgn == pgns::FluidLevel::ID) {
             auto in = pgns::FluidLevel::fromMessage(msg);
-            if (m_instance_id == -1 || in.instance == m_instance_id) {
+            if (m_instance_id == ANY_INSTANCE_ID || in.instance == m_instance_id) {
                 tank_base::FluidLevel out;
                 out.time = in.time;
-                out.currentLevel = in.level / (capacity ? capacity : in.capacity);
-                _level_out.write(out);
+                float const total_capacity = (capacity ? capacity : in.capacity);
+                if (total_capacity > 0) {
+                    out.currentLevel = in.level / total_capacity;
+                    _level_out.write(out);
+                }
             }
         }
     }
