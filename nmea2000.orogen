@@ -127,6 +127,11 @@ end
 task_context 'FluidLevelTask' do
     needs_configuration
 
+    # The fluid level sensor identification
+    #
+    # It is used to verify from each sensor the msg comes, if it's not -1
+    property "instance_id", "/int", -1
+
     # Override the capacity coming from the NMEA2000 device
     #
     # It is used instead of the device-reported capacity if non-zero
