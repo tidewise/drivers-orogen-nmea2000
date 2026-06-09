@@ -76,7 +76,9 @@ void CANTask::updateHook()
 
     auto query_message = m_dispatcher->getQueryProbeMessage();
     if (query_message.first) {
-        _can_out.write(query_message.second.toCAN());
+        for (auto const& msg : query_message.second.toCAN()) {
+            _can_out.write(msg);
+        }
     }
 
     CANTaskBase::updateHook();
