@@ -80,8 +80,8 @@ void CANTask::updateHook()
     }
 
     auto query_message = m_dispatcher->getQueryProbeMessage();
-    if (query_message.first) {
-        writeToCANOut(query_message.second);
+    if (query_message) {
+        writeToCANOut(query_message.value());
     }
 
     CANTaskBase::updateHook();
