@@ -37,6 +37,8 @@ namespace nmea2000{
         std::unique_ptr<Receiver> m_receiver;
         std::unique_ptr<DeviceDispatcher> m_dispatcher;
 
+        void writeToCANOut(nmea2000::Message const& msg);
+
     public:
         /** TaskContext constructor for CANTask
          * \param name Name of the task. This name needs to be unique to make
