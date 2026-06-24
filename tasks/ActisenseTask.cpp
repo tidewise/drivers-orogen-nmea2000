@@ -75,8 +75,8 @@ void ActisenseTask::updateHook()
     }
 
     auto query_message = m_dispatcher->getQueryProbeMessage();
-    if (query_message.first) {
-        m_driver->writeMessage(query_message.second);
+    if (query_message) {
+        m_driver->writeMessage(query_message.value());
     }
 }
 

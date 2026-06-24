@@ -80,24 +80,21 @@ TEST_F(DeviceDispatcherTest, it_starts_in_COMPLETE_state_if_there_are_no_filters
     DeviceDispatcher dispatcher({ });
     auto state = dispatcher.getQueryState();
     ASSERT_EQ(DeviceDispatcher::QUERY_COMPLETE, state);
-    ASSERT_EQ((make_pair(false, Message())),
-              dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(std::nullopt, dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_starts_in_COMPLETE_state_if_all_filters_only_check_the_pgn) {
     DeviceDispatcher dispatcher({ getPGNFilter(42) });
     auto state = dispatcher.getQueryState();
     ASSERT_EQ(DeviceDispatcher::QUERY_COMPLETE, state);
-    ASSERT_EQ((make_pair(false, Message())),
-              dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(std::nullopt, dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_starts_with_a_address_claim_query_if_a_filter_needs_product_info) {
     DeviceDispatcher dispatcher({ getSerialNumberFilter() });
     auto state = dispatcher.getQueryState();
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, state);
-    ASSERT_EQ((make_pair(true, Receiver::queryAddressClaim())),
-              dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(Receiver::queryAddressClaim(), dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_transitions_to_product_info_query_after_the_query_ack_timeout) {
@@ -111,12 +108,12 @@ TEST_F(DeviceDispatcherTest, it_transitions_to_product_info_query_after_the_quer
     dispatcher.process(iso_address_claim);
 
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
-    ASSERT_EQ((make_pair(false, Message())), dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(std::nullopt, dispatcher.getQueryProbeMessage());
 
     usleep(20000);
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
     auto product_info = Receiver::queryProductInformation(iso_address_claim.source);
-    ASSERT_EQ((make_pair(true, product_info)), dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(product_info, dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_queries_other_device_info_once_receiving_one) {
@@ -135,16 +132,16 @@ TEST_F(DeviceDispatcherTest, it_queries_other_device_info_once_receiving_one) {
     dispatcher.process(claim1);
 
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
-    ASSERT_EQ((make_pair(false, Message())), dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(std::nullopt, dispatcher.getQueryProbeMessage());
 
     usleep(20000);
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
     auto product_info_query = Receiver::queryProductInformation(claim0.source);
-    ASSERT_EQ((make_pair(true, product_info_query)), dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(product_info_query, dispatcher.getQueryProbeMessage());
     dispatcher.process(product_info);
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, dispatcher.getQueryState());
     product_info_query = Receiver::queryProductInformation(claim1.source);
-    ASSERT_EQ((make_pair(true, product_info_query)), dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(product_info_query, dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_transitions_to_COMPLETE_if_all_expected_product_info_are_received_and_all_filters_are_matched) {
@@ -159,8 +156,7 @@ TEST_F(DeviceDispatcherTest, it_transitions_to_COMPLETE_if_all_expected_product_
     dispatcher.process(product_info);
     auto state = dispatcher.getQueryState();
     ASSERT_EQ(DeviceDispatcher::QUERY_COMPLETE, state);
-    ASSERT_EQ((make_pair(false, Message())),
-              dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(std::nullopt, dispatcher.getQueryProbeMessage());
 }
 
 TEST_F(DeviceDispatcherTest, it_transitions_to_TIMED_OUT_if_all_expected_product_info_are_received_but_some_filters_are_not_matched) {
@@ -190,8 +186,7 @@ TEST_F(DeviceDispatcherTest, it_keeps_sending_address_claim_queries_if_the_produ
     usleep(20000);
     auto state = dispatcher.getQueryState();
     ASSERT_EQ(DeviceDispatcher::QUERY_IN_PROGRESS, state);
-    ASSERT_EQ((make_pair(true, Receiver::queryAddressClaim())),
-              dispatcher.getQueryProbeMessage());
+    ASSERT_EQ(Receiver::queryAddressClaim(), dispatcher.getQueryProbeMessage());
 }
 
 struct DeviceDispatcher_DispatchingTest : public DeviceDispatcherTest {

@@ -46,10 +46,15 @@ task_context 'CANTask' do
     # resolution is needed
     property 'enumeration_ack_timeout', '/base/Time'
 
+    # nmea2000 messages to be written on the bus
+    input_port('n2k_in', '/nmea2000/Message')
+        .multiplexes
+        .needs_reliable_connection
+
     # Dispatched messages as set up by the 'devices' property
     dynamic_output_port(/\w+/, '/nmea2000/Message')
 
-    # All the received N2K messages
+    # All the received N2K messages from the CAN Bus
     output_port 'messages', '/nmea2000/Message'
 
     # Address claims

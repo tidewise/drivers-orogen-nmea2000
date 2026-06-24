@@ -57,7 +57,7 @@ namespace nmea2000 {
 
         bool getContinuousDeviceEnumeration() const;
 
-        std::pair<bool, Message> getQueryProbeMessage();
+        std::optional<Message> getQueryProbeMessage();
 
         QueryState getQueryState() const;
 

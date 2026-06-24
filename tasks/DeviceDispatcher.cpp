@@ -94,19 +94,19 @@ bool DeviceDispatcher::getContinuousDeviceEnumeration() const {
     return m_continuous_query;
 }
 
-std::pair<bool, Message> DeviceDispatcher::getQueryProbeMessage() {
+std::optional<Message> DeviceDispatcher::getQueryProbeMessage() {
     auto now = base::Time::now();
 
     if (now < m_enumeration_ack_deadline) {
         if (!m_pending_product_queries.empty() && m_received_expected_product_info) {
             m_received_expected_product_info = false;
             int query = *m_pending_product_queries.begin();
-            return make_pair(true, Receiver::queryProductInformation(query));
+            return Receiver::queryProductInformation(query);
         }
-        return make_pair(false, Message());
+        return std::nullopt;
     }
     else if (!m_needs_resolution && !m_continuous_query) {
-        return make_pair(false, Message());
+        return std::nullopt;
     }
 
     m_received_expected_product_info = false;
@@ -115,11 +115,11 @@ std::pair<bool, Message> DeviceDispatcher::getQueryProbeMessage() {
     if (m_query_address_claim || m_pending_product_queries.empty()) {
         m_query_address_claim = true;
         m_pending_product_queries.clear();
-        return make_pair(true, Receiver::queryAddressClaim());
+        return Receiver::queryAddressClaim();
     }
     else {
         int query = *m_pending_product_queries.begin();
-        return make_pair(true, Receiver::queryProductInformation(query));
+        return Receiver::queryProductInformation(query);
     }
 }
 

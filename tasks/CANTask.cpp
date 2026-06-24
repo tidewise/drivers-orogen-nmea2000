@@ -46,6 +46,11 @@ bool CANTask::startHook()
 }
 void CANTask::updateHook()
 {
+    nmea2000::Message n2k_in;
+    while (_n2k_in.read(n2k_in) == RTT::NewData) {
+        writeToCANOut(n2k_in);
+    }
+
     canbus::Message can;
     while (_can_in.read(can) == RTT::NewData) {
         auto msg = Message::fromCAN(can);
@@ -75,14 +80,20 @@ void CANTask::updateHook()
     }
 
     auto query_message = m_dispatcher->getQueryProbeMessage();
-    if (query_message.first) {
-        for (auto const& msg : query_message.second.toCAN()) {
-            _can_out.write(msg);
-        }
+    if (query_message) {
+        writeToCANOut(query_message.value());
     }
 
     CANTaskBase::updateHook();
 }
+
+void CANTask::writeToCANOut(nmea2000::Message const& msg)
+{
+    for (auto const& can_msg : msg.toCAN()) {
+        _can_out.write(can_msg);
+    }
+}
+
 void CANTask::errorHook()
 {
     CANTaskBase::errorHook();
