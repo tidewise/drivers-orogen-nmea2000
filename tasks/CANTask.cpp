@@ -9,7 +9,7 @@ using namespace nmea2000;
 
 CANTask::CANTask(std::string const& name)
     : CANTaskBase(name)
-    , m_library(pgns::getLibrary()) {
+{
 }
 
 CANTask::~CANTask()
@@ -28,6 +28,9 @@ bool CANTask::configureHook()
     ));
     m_dispatcher->setContinuousDeviceEnumeration(_continuous_device_enumeration.get());
     m_dispatcher->addPorts(*this);
+
+    m_library = pgns::getLibrary();
+    m_library.augment(_pgn_augment.get());
 
     return true;
 }
