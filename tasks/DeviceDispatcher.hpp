@@ -3,6 +3,7 @@
 
 #include <nmea2000/nmea2000Types.hpp>
 #include <nmea2000/Message.hpp>
+#include <optional>
 #include <rtt/OutputPort.hpp>
 #include <set>
 
