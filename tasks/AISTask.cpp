@@ -1,6 +1,6 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
-#include "AISTask.hpp"
+#include <AISTask.hpp>
 #include <nmea2000/PGNs.hpp>
 
 using namespace nmea2000;
@@ -14,21 +14,19 @@ AISTask::~AISTask()
 {
 }
 
-
-
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See AISTask.hpp for more detailed
 // documentation about them.
 
 bool AISTask::configureHook()
 {
-    if (! AISTaskBase::configureHook())
+    if (!AISTaskBase::configureHook())
         return false;
     return true;
 }
 bool AISTask::startHook()
 {
-    if (! AISTaskBase::startHook())
+    if (!AISTaskBase::startHook())
         return false;
     return true;
 }
@@ -98,15 +96,14 @@ void AISTask::updateHook()
             info_out.time = in.time;
             info_out.mmsi = in.user_id;
             info_out.imo = 0;
-            info_out.name = in.name;
+            info_out.name = stripLimitMarkers(in.name);
             info_out.length = in.length;
             info_out.width = in.beam;
             info_out.ship_type = static_cast<ais_base::ShipType>(in.type_of_ship);
             info_out.epfd_fix = static_cast<ais_base::EPFDFixType>(in.gnss_type);
-            info_out.reference_position =
-                Eigen::Vector3d(in.position_reference_from_bow,
-                                -in.position_reference_from_starboard,
-                                0);
+            info_out.reference_position = Eigen::Vector3d(in.position_reference_from_bow,
+                -in.position_reference_from_starboard,
+                0);
             info_out.ensureEnumsValid();
             _vessel_information.write(info_out);
         }
@@ -118,17 +115,16 @@ void AISTask::updateHook()
             info_out.time = in.time;
             info_out.mmsi = in.user_id;
             info_out.imo = in.imo_number;
-            info_out.name = in.name;
-            info_out.call_sign = in.callsign;
+            info_out.name = stripLimitMarkers(in.name);
+            info_out.call_sign = stripLimitMarkers(in.callsign);
             info_out.length = in.length;
             info_out.width = in.beam;
             info_out.draft = in.draft;
             info_out.ship_type = static_cast<ais_base::ShipType>(in.type_of_ship);
             info_out.epfd_fix = static_cast<ais_base::EPFDFixType>(in.gnss_type);
-            info_out.reference_position =
-                Eigen::Vector3d(in.position_reference_from_bow,
-                                -in.position_reference_from_starboard,
-                                0);
+            info_out.reference_position = Eigen::Vector3d(in.position_reference_from_bow,
+                -in.position_reference_from_starboard,
+                0);
             info_out.ensureEnumsValid();
             _vessel_information.write(info_out);
 
@@ -140,12 +136,11 @@ void AISTask::updateHook()
             // particular hairy problem
             voyage_out.eta = base::Time::fromMilliseconds(
                 (static_cast<uint64_t>(in.eta_date) * 3600 * 24 +
-                 static_cast<uint64_t>(in.eta_time)) * 1000
-            );
-            voyage_out.destination = in.destination;
+                    static_cast<uint64_t>(in.eta_time)) *
+                1000);
+            voyage_out.destination = stripLimitMarkers(in.destination);
             _voyage_information.write(voyage_out);
         }
-
     }
     AISTaskBase::updateHook();
 }
@@ -160,4 +155,12 @@ void AISTask::stopHook()
 void AISTask::cleanupHook()
 {
     AISTaskBase::cleanupHook();
+}
+
+std::string AISTask::stripLimitMarkers(std::string const& data) const
+{
+    // Any of these characters can mean the end of the string when parsing AIS data from
+    // NMEA2000
+    auto first_limit_marker = data.find_first_of("\0\xff@", 0, 3);
+    return data.substr(0, first_limit_marker);
 }
