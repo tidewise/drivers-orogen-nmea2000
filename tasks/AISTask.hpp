@@ -5,13 +5,16 @@
 
 #include "nmea2000/AISTaskBase.hpp"
 
-namespace nmea2000{
+namespace nmea2000 {
 
     /*! \class AISTask
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * 
+     * \brief The task context provides and requires services. It uses an ExecutionEngine
+     to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These
+     interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the
+     associated workflow.
+     *
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
@@ -19,25 +22,27 @@ namespace nmea2000{
          task('custom_task_name','nmea2000::AISTask')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     *  It can be dynamically adapted when the deployment is called with a prefix
+     argument.
      */
-    class AISTask : public AISTaskBase
-    {
-	friend class AISTaskBase;
+    class AISTask : public AISTaskBase {
+        friend class AISTaskBase;
+
     protected:
-
-
+        std::string stripLimitMarkers(std::string const& data) const;
 
     public:
         /** TaskContext constructor for AISTask
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+         * \param name Name of the task. This name needs to be unique to make it
+         * identifiable via nameservices.
+         * \param initial_state The initial TaskState of the TaskContext. Default is
+         * Stopped state.
          */
         AISTask(std::string const& name = "nmea2000::AISTask");
 
         /** Default deconstructor of AISTask
          */
-	~AISTask();
+        ~AISTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -100,4 +105,3 @@ namespace nmea2000{
 }
 
 #endif
-
