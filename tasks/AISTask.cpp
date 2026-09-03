@@ -40,13 +40,13 @@ void AISTask::updateHook()
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
-            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.course_over_ground = base::Angle::fromDeg(-in.cog);
             position_out.latitude = base::Angle::fromDeg(in.latitude);
             position_out.longitude = base::Angle::fromDeg(in.longitude);
             position_out.status = (ais_base::NavigationalStatus)in.nav_status;
             position_out.high_accuracy_position = (in.position_accuracy == 1);
-            position_out.yaw = base::Angle::fromDeg(in.heading);
-            position_out.yaw_velocity = in.rate_of_turn * M_PI / 180;
+            position_out.yaw = base::Angle::fromDeg(-in.heading);
+            position_out.yaw_velocity = -in.rate_of_turn * M_PI / 180;
             position_out.speed_over_ground = in.sog;
 
             // Filter out what looks like uninitialized messages. I never
@@ -63,11 +63,11 @@ void AISTask::updateHook()
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
-            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.course_over_ground = base::Angle::fromDeg(-in.cog);
             position_out.latitude = base::Angle::fromDeg(in.latitude);
             position_out.longitude = base::Angle::fromDeg(in.longitude);
             position_out.high_accuracy_position = (in.position_accuracy == 1);
-            position_out.yaw = base::Angle::fromDeg(in.heading);
+            position_out.yaw = base::Angle::fromDeg(-in.heading);
             position_out.speed_over_ground = in.sog;
 
             // Filter out what looks like uninitialized Class B messages. Was
@@ -83,11 +83,11 @@ void AISTask::updateHook()
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
-            position_out.course_over_ground = base::Angle::fromDeg(in.cog);
+            position_out.course_over_ground = base::Angle::fromDeg(-in.cog);
             position_out.latitude = base::Angle::fromDeg(in.latitude);
             position_out.longitude = base::Angle::fromDeg(in.longitude);
             position_out.high_accuracy_position = false;
-            position_out.yaw = base::Angle::fromDeg(in.true_heading);
+            position_out.yaw = base::Angle::fromDeg(-in.true_heading);
             position_out.speed_over_ground = in.sog;
             position_out.ensureEnumsValid();
             _vessel_position.write(position_out);

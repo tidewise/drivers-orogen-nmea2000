@@ -58,7 +58,7 @@ describe OroGen.nmea2000.AISTask do
         assert(output.course_over_ground.rad.nan?)
         assert_in_delta(0.05, output.speed_over_ground, 1e-6)
         assert(output.yaw.rad.nan?)
-        assert_in_delta(3.2767, output.yaw_velocity, 1e-6)
+        assert_in_delta(-3.2767, output.yaw_velocity, 1e-6)
         assert_equal(:STATUS_NOT_DEFINED, output.status)
     end
 
