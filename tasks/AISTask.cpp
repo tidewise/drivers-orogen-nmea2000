@@ -1,6 +1,7 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.cpp */
 
 #include <AISTask.hpp>
+#include <algorithm>
 #include <nmea2000/PGNs.hpp>
 
 using namespace nmea2000;
@@ -22,6 +23,7 @@ bool AISTask::configureHook()
 {
     if (!AISTaskBase::configureHook())
         return false;
+    m_filtered_mmsis = _filtered_mmsis.get();
     return true;
 }
 bool AISTask::startHook()
@@ -37,6 +39,10 @@ void AISTask::updateHook()
         if (pgns::AISClassAPositionReport::ID == msg.pgn) {
             pgns::AISClassAPositionReport in =
                 pgns::AISClassAPositionReport::fromMessage(msg);
+            if (shouldFilterOut(in.user_id)) {
+                continue;
+            }
+
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
@@ -60,6 +66,9 @@ void AISTask::updateHook()
         else if (pgns::AISClassBPositionReport::ID == msg.pgn) {
             pgns::AISClassBPositionReport in =
                 pgns::AISClassBPositionReport::fromMessage(msg);
+            if (shouldFilterOut(in.user_id)) {
+                continue;
+            }
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
@@ -80,6 +89,9 @@ void AISTask::updateHook()
         else if (pgns::AISClassBExtendedPositionReport::ID == msg.pgn) {
             pgns::AISClassBExtendedPositionReport in =
                 pgns::AISClassBExtendedPositionReport::fromMessage(msg);
+            if (shouldFilterOut(in.user_id)) {
+                continue;
+            }
             ais_base::Position position_out;
             position_out.time = in.time;
             position_out.mmsi = in.user_id;
@@ -110,6 +122,9 @@ void AISTask::updateHook()
         else if (pgns::AISClassAStaticAndVoyageRelatedData::ID == msg.pgn) {
             pgns::AISClassAStaticAndVoyageRelatedData in =
                 pgns::AISClassAStaticAndVoyageRelatedData::fromMessage(msg);
+            if (shouldFilterOut(in.user_id)) {
+                continue;
+            }
 
             ais_base::VesselInformation info_out;
             info_out.time = in.time;
@@ -163,4 +178,10 @@ std::string AISTask::stripLimitMarkers(std::string const& data) const
     // NMEA2000
     auto first_limit_marker = data.find_first_of("\0\xff@", 0, 3);
     return data.substr(0, first_limit_marker);
+}
+
+bool AISTask::shouldFilterOut(int32_t mmsi) const
+{
+    return std::find(m_filtered_mmsis.begin(), m_filtered_mmsis.end(), mmsi) !=
+           m_filtered_mmsis.end();
 }

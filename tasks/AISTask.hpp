@@ -4,6 +4,7 @@
 #define NMEA2000_AISTASK_TASK_HPP
 
 #include "nmea2000/AISTaskBase.hpp"
+#include <vector>
 
 namespace nmea2000 {
 
@@ -29,6 +30,9 @@ namespace nmea2000 {
         friend class AISTaskBase;
 
     protected:
+        std::vector<int32_t> m_filtered_mmsis;
+
+        bool shouldFilterOut(int32_t mmsi) const;
         std::string stripLimitMarkers(std::string const& data) const;
 
     public:
