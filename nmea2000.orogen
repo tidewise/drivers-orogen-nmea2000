@@ -102,6 +102,8 @@ end
 task_context 'AISTask' do
     needs_configuration
 
+    property 'filtered_mmsis', '/std/vector<int32_t>'
+
     input_port('msg_in', '/nmea2000/Message')
         .needs_reliable_connection
 

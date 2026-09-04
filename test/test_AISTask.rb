@@ -296,6 +296,299 @@ describe OroGen.nmea2000.AISTask do
         assert_equal("PARANAGUA PR", voyage_information.destination)
     end
 
+    it "filters out mmsis based on the property that was set for class A position " \
+       "reports" do
+        task.properties.filtered_mmsis = [710_400_932]
+        syskit_configure_and_start(@task)
+        payload = [
+            1,
+            164,
+            219,
+            87,
+            42,
+            187,
+            62,
+            21,
+            227,
+            158,
+            173,
+            204,
+            240,
+            123,
+            255,
+            255,
+            5,
+            0,
+            126,
+            132,
+            0,
+            255,
+            255,
+            255,
+            127,
+            192,
+            248,
+            255
+        ]
+
+        expect_execution { nmea2000_write pgn: 129_038, payload: payload }
+            .to { have_no_new_sample task.vessel_position_port }
+
+        # Shows that a payload with another mmsi would still go through
+        payload[1] += 1
+        output = expect_execution { nmea2000_write pgn: 129_038, payload: payload }
+                 .to { have_one_new_sample task.vessel_position_port }
+        assert_equal 710_400_933, output.mmsi
+    end
+
+    it "filters out mmsis based on the property that was set for class B position " \
+       "reports" do
+        task.properties.filtered_mmsis = [710_400_932]
+        syskit_configure_and_start(@task)
+        payload = [
+            19,
+            164,
+            219,
+            87,
+            42,
+            205,
+            5,
+            24,
+            227,
+            0,
+            217,
+            202,
+            240,
+            124,
+            255,
+            255,
+            0,
+            0,
+            0,
+            0,
+            52,
+            255,
+            255,
+            16,
+            64,
+            1,
+            120,
+            0,
+            60,
+            0,
+            120,
+            0,
+            83,
+            65,
+            65,
+            77,
+            32,
+            69,
+            76,
+            69,
+            67,
+            84,
+            82,
+            65,
+            65,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            2,
+            225
+        ]
+
+        expect_execution { nmea2000_write pgn: 129_039, payload: payload }
+            .to { have_no_new_sample task.vessel_position_port }
+
+        # Shows that a payload with another mmsi would still go through
+        payload[1] += 1
+        output = expect_execution { nmea2000_write pgn: 129_039, payload: payload }
+                 .to { have_one_new_sample task.vessel_position_port }
+        assert_equal 710_400_933, output.mmsi
+    end
+
+    it "filters out mmsis based on the property that was set for class B extended " \
+       "reports" do
+        task.properties.filtered_mmsis = [710_400_932]
+        syskit_configure_and_start(@task)
+        payload = [
+            19,
+            164,
+            219,
+            87,
+            42,
+            205,
+            5,
+            24,
+            227,
+            0,
+            217,
+            202,
+            240,
+            124,
+            255,
+            255,
+            0,
+            0,
+            0,
+            0,
+            52,
+            255,
+            255,
+            16,
+            64,
+            1,
+            120,
+            0,
+            60,
+            0,
+            120,
+            0,
+            83,
+            65,
+            65,
+            77,
+            32,
+            69,
+            76,
+            69,
+            67,
+            84,
+            82,
+            65,
+            65,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            2,
+            225
+        ]
+
+        expect_execution { nmea2000_write pgn: 129_040, payload: payload }
+            .to do
+            have_no_new_sample(task.vessel_position_port)
+            have_no_new_sample(task.vessel_information_port)
+        end
+
+        # Shows that a payload with another mmsi would still go through
+        payload[1] += 1
+        vessel_pos, vessel_info =
+            expect_execution { nmea2000_write pgn: 129_040, payload: payload }
+            .to do
+            [have_one_new_sample(task.vessel_position_port),
+             have_one_new_sample(task.vessel_information_port)]
+        end
+        assert_equal 710_400_933, vessel_info.mmsi
+        assert_equal 710_400_933, vessel_pos.mmsi
+    end
+
+    it "filters out mmsis based on the property that was set for class A static and " \
+       "voyage related data" do
+        task.properties.filtered_mmsis = [710_400_932]
+        syskit_configure_and_start(@task)
+        payload = [
+            5,
+            164,
+            219,
+            87,
+            42,
+            106,
+            181,
+            150,
+            0,
+            80,
+            85,
+            53,
+            54,
+            57,
+            57,
+            64,
+            83,
+            65,
+            65,
+            77,
+            32,
+            69,
+            76,
+            69,
+            67,
+            84,
+            82,
+            65,
+            65,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            52,
+            64,
+            1,
+            120,
+            0,
+            60,
+            0,
+            120,
+            0,
+            215,
+            80,
+            0,
+            204,
+            191,
+            25,
+            78,
+            2,
+            80,
+            65,
+            82,
+            65,
+            78,
+            65,
+            71,
+            85,
+            65,
+            32,
+            80,
+            82,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            64,
+            2,
+            225
+        ]
+
+        expect_execution { nmea2000_write pgn: 129_794, payload: payload }
+            .to do
+            have_no_new_sample(task.voyage_information_port)
+            have_no_new_sample(task.vessel_information_port)
+        end
+
+        # Shows that a payload with another mmsi would still go through
+        payload[1] += 1
+        vessel_info =
+            expect_execution { nmea2000_write pgn: 129_794, payload: payload }
+            .to do
+             have_one_new_sample(task.vessel_information_port)
+        end
+        assert_equal 710_400_933, vessel_info.mmsi
+    end
+
     def nmea2000_write(time: Time.now, priority: 0, destination: 0xff,
         source: 0, pgn:, payload:)
         message = Types.nmea2000.Message.new(
